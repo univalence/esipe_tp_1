@@ -26,7 +26,7 @@ import scala.util.Random
  * We have kept the labs text in english. This will enable us to reuse them in international sections.
  */
 
-object Word_count_text {
+object Word_count_text_corrected {
 
 
   def main(args: Array[String]): Unit = {
@@ -93,9 +93,8 @@ object Word_count_text {
     val wordsRDD = sc.parallelize(wordsList, 4)
     // Print out the type of wordsRDD
     println(wordsRDD.getClass)
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * ** (1b) Pluralize and test **
      *
      * Let's use a map() transformation to add the letter 's' to each string in the base RDD we just created.
@@ -120,7 +119,7 @@ object Word_count_text {
 
       Returns:
           str: A string with 's' added to it.
-     */
+      */
       ???
     }
 
@@ -135,9 +134,8 @@ object Word_count_text {
     assertResult("rats", "incorrect result: makePlural does not add an s") {
       makePlural("rat")
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (1c) Apply makePlural to the base RDD **
      *
      * Now pass each item in the base RDD into a map() transformation that applies the makePlural() function to each element.
@@ -145,32 +143,30 @@ object Word_count_text {
      */
 
     // TODO: Replace ??? with appropriate code
-    val pluralRDD = wordsRDD.map(???)
+    val pluralRDD = wordsRDD.map(makePlural)
     pluralRDD.collect.foreach(println)
 
     // TEST Apply makePlural to the base RDD(1c)
     assertResult(Array("cats", "elephants", "rats", "rats", "cats"), "incorrect values for pluralRDD") {
       pluralRDD.collect
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (1d) Pass a lambda function to map **
      *
      * Let's create the same RDD using a lambda function.
      */
 
     // TODO: Replace ??? with appropriate code
-    val pluralLambdaRDD = wordsRDD.map(???)
+    val pluralLambdaRDD = wordsRDD.map(x => x + "s")
     pluralLambdaRDD.collect.foreach(println)
 
     //TEST Pass a lambda function to map (1d)
     assertResult(List("cats", "elephants", "rats", "rats", "cats"), "incorrect values for pluralLambdaRDD (1d)") {
       pluralLambdaRDD.collect
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (1e) Length of each word **
      *
      * Now use map() and a lambda function to return the number of characters in each word.
@@ -179,7 +175,7 @@ object Word_count_text {
 
     // TODO: Replace ??? with appropriate code
     val pluralLengths = pluralRDD
-      .???
+      .map(x => x.length)
       .collect
     pluralLengths.foreach(println)
 
@@ -187,10 +183,8 @@ object Word_count_text {
     assertResult(List(4, 9, 4, 4, 4), "incorrect values for pluralLengths") {
       pluralLengths
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * ** (1f) Pair RDDs **
      *
      * The next step in writing our word counting program is to create a new type of RDD, called a pair RDD.
@@ -201,16 +195,15 @@ object Word_count_text {
      */
 
     // TODO: Replace ??? with appropriate code
-    val wordPairs = wordsRDD.???
+    val wordPairs = wordsRDD.map((_,1))
     wordPairs.collect.foreach(println)
 
     // TEST Pair RDDs (1f)
     assertResult(List(("cat", 1), ("elephant", 1), ("rat", 1), ("rat", 1), ("cat", 1)), "incorrect values for wordPairs") {
       wordPairs.collect
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * --------------------------------------------
      * 2. Counting with pair RDDs
      * --------------------------------------------
@@ -236,18 +229,17 @@ object Word_count_text {
      */
     // TODO: Replace ??? with appropriate code
     // Note that groupByKey requires no parameters
-    val wordsGrouped = wordPairs.???
+    val wordsGrouped = wordPairs.groupByKey//.???
     val keyValues = wordsGrouped.collect
     keyValues.foreach(x => println(x._1,x._2))
 
     // TEST groupByKey() approach (2a)
     assertResult(Array(("cat", List(1, 1)), ("elephant", List(1)), ("rat", List(1, 1))),
-    "incorrect value for wordsGrouped") {
+      "incorrect value for wordsGrouped") {
       wordsGrouped.mapValues(_.toList).collect.sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (2b) Use groupByKey() to obtain the counts **
      *
      * Using the `groupByKey()` transformation creates an RDD containing 3 elements, each of which is a pair of a word and an Iterable.
@@ -255,17 +247,16 @@ object Word_count_text {
      */
 
     // TODO: Replace ??? with appropriate code
-    val wordCountsGrouped = wordsGrouped.???
+    val wordCountsGrouped = wordsGrouped.map(x => (x._1,x._2.sum))//.???
     wordCountsGrouped.collect.foreach(println)
 
     // TEST Use groupByKey() to obtain the counts (2b)
     assertResult(Array(("cat", 2), ("elephant", 1), ("rat", 2)),
-    "incorrect value for wordCountsGrouped") {
+      "incorrect value for wordCountsGrouped") {
       wordCountsGrouped.collect.sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (2c) Counting using reduceByKey **
      *
      * A better approach is to start from the pair RDD and then use the reduceByKey() transformation to create a new pair RDD.
@@ -275,7 +266,7 @@ object Word_count_text {
 
     // TODO: Replace ??? with appropriate code
     // Note that reduceByKey takes in a function that accepts two values and returns a single value
-    val wordCounts = wordPairs.reduceByKey(???)
+    val wordCounts = wordPairs.reduceByKey((x,y) => x + y)
     wordCounts.collect.foreach(println)
 
     // TEST Counting using reduceByKey (2c)
@@ -283,9 +274,8 @@ object Word_count_text {
       "incorrect value for wordCounts") {
       wordCounts.collect.sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (2d) All together **
      *
      * The expert version of the code performs the map() to pair RDD, reduceByKey() transformation, and collect in one statement.
@@ -293,18 +283,17 @@ object Word_count_text {
 
     // TODO: Replace ??? with appropriate code
     val wordCountsCollected = wordsRDD
-                              .???
+      .map((_,1)).reduceByKey(_+_)//.???
       .collect()
     wordCountsCollected.foreach(println)
 
     // TEST All together (2d)
     assertResult(Array(("cat", 2), ("elephant", 1), ("rat", 2)),
-    "incorrect value for wordCountsCollected") {
+      "incorrect value for wordCountsCollected") {
       wordCountsCollected.sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * --------------------------------------------
      * 3. Finding unique words and a mean value
      * --------------------------------------------
@@ -314,16 +303,15 @@ object Word_count_text {
      */
 
     // TODO: Replace ??? with appropriate code
-    val uniqueWords = ???
+    val uniqueWords = wordsGrouped.count//???
     println(uniqueWords)
 
     // TEST Unique words (3a)
     assertResult(3, "incorrect count of uniqueWords") {
       uniqueWords
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (3b) Mean using reduce **
      *
      * Find the mean number of words per unique word in `wordCounts`.
@@ -334,9 +322,9 @@ object Word_count_text {
 
     // TODO: Replace ??? with appropriate code
     val totalCount = (wordCounts
-      .map(???)
-      .reduce(???))
-    val average = totalCount / ???.toFloat
+      .map(_._2)
+      .reduce(_+_))
+    val average = totalCount / uniqueWords.toFloat
     println(totalCount)
     println(BigDecimal(average).setScale(2, RoundingMode.HALF_UP))
 
@@ -344,9 +332,8 @@ object Word_count_text {
     assertResult( BigDecimal(1.67), "incorrect value of average") {
       BigDecimal(average).setScale(2, RoundingMode.HALF_UP)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * --------------------------------------------
      * 4. Apply word count to a file
      * --------------------------------------------
@@ -370,20 +357,19 @@ object Word_count_text {
 
       Returns:
       RDD of (str, int): An RDD consisting of (word, count) tuples.
-     */
-      ???
+      */
+      wordListRDD.map((_,1)).reduceByKey(_+_)
     }
 
     wordCount(wordsRDD).collect.foreach(println)
 
     // TEST wordCount function (4a)
     assertResult(Array(("cat", 2), ("elephant", 1), ("rat", 2)),
-    "incorrect definition for wordCount function") {
+      "incorrect definition for wordCount function") {
       wordCount(wordsRDD).collect.sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (4b) Capitalization and punctuation **
      *
      * Real world files are more complicated than the data we have been using in this lab.
@@ -411,10 +397,10 @@ object Word_count_text {
 
     Returns:
         str: The cleaned up string.
-     */
+       */
 
       val text_no_punctuation = text.replaceAll("[^a-zA-Z0-9 ]+","")
-      ???
+      text_no_punctuation.toLowerCase.trim//???
     }
 
     println(removePunctuation("Hi, you!"))
@@ -425,10 +411,8 @@ object Word_count_text {
       "incorrect definition for removePunctuation function") {
       removePunctuation(" The Elephant's 4 cats. ")
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * ** (4c) Load a text file **
      *
      * For the next part of this lab, we will use the Complete Works of William Shakespeare (http://www.gutenberg.org/ebooks/100)
@@ -447,10 +431,9 @@ object Word_count_text {
     shakespeareRDD
       .zipWithIndex()  // to (line, lineNum)
       .map(x => s"${x._2}:${x._1}")  // to 'lineNum: line'
-    .take(15).foreach(println)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+      .take(15).foreach(println)
+
+    /***
      * ** (4d) Words from lines **
      *
      * Before we can use the wordcount() function, we have to address two issues with the format of the RDD:
@@ -464,7 +447,7 @@ object Word_count_text {
      * Use an other transformation.
      */
     // TODO: Replace ??? with appropriate code
-    val shakespeareWordsRDD = shakespeareRDD.???
+    val shakespeareWordsRDD = shakespeareRDD.flatMap(_.split(" ")) //???
     val shakespeareWordCount = shakespeareWordsRDD.count
     shakespeareWordsRDD.top(5).foreach(println)
     println(shakespeareWordCount)
@@ -474,15 +457,14 @@ object Word_count_text {
     assertResult(true, "incorrect value for shakespeareWordCount") {
       shakespeareWordCount == 927631 || shakespeareWordCount == 928908
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (4e) Remove empty elements **
      *
      * The next step is to filter out the empty elements. Remove all entries where the word is "".
      */
     // TODO: Replace ??? with appropriate code
-    val shakeWordsRDD = shakespeareWordsRDD.???
+    val shakeWordsRDD = shakespeareWordsRDD.filter(_ != "") //???
     val shakeWordCount = shakeWordsRDD.count
     println(shakeWordCount)
 
@@ -490,24 +472,22 @@ object Word_count_text {
     assertResult(882996 , "incorrect value for shakeWordCount") {
       shakeWordCount
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (4f) Count the vocabulary size **
      *
      * How many different words (vocabulary size) are there in Shakespeare's vocabulary?
      */
     // let us get the complete Shakespare' vocabulary
-    val shakespare_vocab_size = ???
+    val shakespare_vocab_size = shakeWordsRDD.map((_,1)).groupByKey().count() //???
     println(s"Shakespeare vocabulary contains $shakespare_vocab_size words")
 
     // TEST Count the vocabulary size (4f)
     assertResult(28147, "incorrect value for shakespare_vocab_size") {
       shakespare_vocab_size
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** (4g) Get the top words **
      *
      * We now have an RDD that is only words.
@@ -518,20 +498,19 @@ object Word_count_text {
      * Use the `wordCount()` function and `takeOrdered()` to obtain the fifteen most common words and their counts.
      */
     // TODO Replace ??? with appropriate code
-    val top15WordsAndCounts = ???
+    val top15WordsAndCounts = wordCount(shakeWordsRDD).takeOrdered(15)(Ordering.by(x => -x._2)) //???
     top15WordsAndCounts.foreach(x => println(s"${x._1}: ${x._2}"))
 
     // TEST Count the words (4f)
     assertResult(
       Array(("the", 27361), ("and", 26028), ("i", 20681), ("to", 19150), ("of", 17463),
-    ("a", 14593), ("you", 13615), ("my", 12481), ("in", 10956), ("that", 10890),
-    ("is", 9134), ("not", 8497), ("with", 7771), ("me", 7769), ("it", 7678)),
-    "incorrect value for top15WordsAndCounts") {
+        ("a", 14593), ("you", 13615), ("my", 12481), ("in", 10956), ("that", 10890),
+        ("is", 9134), ("not", 8497), ("with", 7771), ("me", 7769), ("it", 7678)),
+      "incorrect value for top15WordsAndCounts") {
       top15WordsAndCounts
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ********************************************
      * Part 2 : Short tutorial to DataFrames
      * ********************************************
@@ -575,7 +554,7 @@ object Word_count_text {
     import faker._
     import spark.implicits._
 
-/***
+    /***
      * We're going to create a collection of randomly generated people records.
      * In the next section, we'll turn that collection into a DataFrame.
      * We'll use the spark.implicits._, because that will give us helpers to create a DataFrame from a List for example.
@@ -586,10 +565,8 @@ object Word_count_text {
     val random = new Random()
 
     val data = for (n <- 1 to 10000) yield (Name.first_name,Name.last_name, PhoneNumber.phone_number, random.nextInt(90)+1)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * --------------------------------------------
      * 3. Distributed data and using a collection to create a DataFrame
      * --------------------------------------------
@@ -616,10 +593,8 @@ object Word_count_text {
     dataDF.printSchema()
     //How many partitions will the DataFrame be split into?
     println(dataDF.rdd.getNumPartitions)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * --------------------------------------------
      * 4. Subtract one from each value using select
      * --------------------------------------------
@@ -640,10 +615,8 @@ object Word_count_text {
     //Transform dataDF through a select transformation and rename the newly created '(age -1)' column to 'age'
     //Because select is a transformation and Spark uses lazy evaluation, no jobs, stages, or tasks will be launched when we run this code.
     val subDF = dataDF.select(dataDF("last_name"), dataDF("first_name"), (dataDF("age") - 1).alias("age"))
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * --------------------------------------------
      * 5. Use collect or show to view results
      * --------------------------------------------
@@ -669,9 +642,7 @@ object Word_count_text {
     results.foreach(println)
 
     subDF.show() //Look at parameters
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+    /***
      * --------------------------------------------
      * 6. Use count to get total
      * --------------------------------------------
@@ -691,10 +662,8 @@ object Word_count_text {
     val subDFCount = subDF.count
     println(dataDFCount)
     println(subDFCount)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * --------------------------------------------
      * 7. Apply transformation filter and view results with collect
      * --------------------------------------------
@@ -712,10 +681,8 @@ object Word_count_text {
     val filteredDF = subDF.filter(subDF("age") < 10)
     filteredDF.show(truncate = false)
     println(filteredDF.count)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * --------------------------------------------
      * 8. Additional DataFrame actions
      * --------------------------------------------
@@ -732,10 +699,8 @@ object Word_count_text {
     println(s"first: ${filteredDF.first}")
     println("Four of them:")
     filteredDF.take(4).foreach(println)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
 
-/***
+    /***
      * --------------------------------------------
      * 9. Additional DataFrame transformations
      * --------------------------------------------
@@ -757,9 +722,8 @@ object Word_count_text {
      */
     //Get the five oldest people in the list. To do that, sort by age in descending order.
     dataDF.orderBy(dataDF("age").desc).take(5).foreach(println)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** distinct and _dropDuplicates_**
      *
      * distinct() filters out duplicate rows, and it considers all columns.
@@ -770,7 +734,7 @@ object Word_count_text {
     println(dataDFCount)
     println(dataDFDistinctCount)
 
-/***
+    /***
      * ** _drop_**
      *
      * drop() is like the opposite of select(): Instead of selecting specific columns from a DataFrame, it drops a specifed column from a DataFrame.
@@ -779,7 +743,7 @@ object Word_count_text {
      * Instead of selecting 995 of the columns, it's easier just to drop the five you don't want.
      */
 
-/***
+    /***
      * groupBy
      *
      * [groupBy()]((https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.Dataset@groupBy(cols:org.apache.spark.sql.Column*):org.apache.spark.sql.RelationalGroupedDataset) is one of the most powerful transformations.
@@ -792,11 +756,9 @@ object Word_count_text {
      *
      * These aggregation functions typically create a new column and return a new DataFrame.
      */
-     dataDF.groupBy("age").count().show(truncate = false)
+    dataDF.groupBy("age").count().show(truncate = false)
 
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+    /***
      * ********************************************
      * Part 3 : WordCount with Dataframes
      * ********************************************
@@ -811,9 +773,8 @@ object Word_count_text {
     wordsDF.show()
     println(wordsDF.getClass)
     wordsDF.printSchema()
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * --------------------------------------------
      * 1. Counting with Spark SQL and DataFrames
      * --------------------------------------------
@@ -835,16 +796,15 @@ object Word_count_text {
      * To find the counts of words, group by the words and then use the count function to find the number of times that words occur.
      */
     // TODO: Replace ??? with appropriate code
-    val wordCountsDF = wordsDF.???
+    val wordCountsDF = wordsDF.groupBy(wordsDF("word")).count() //???
     wordCountsDF.show()
 
     // TEST groupBy and count (2a)
     assertResult(Array(("cat",2), ("elephant",1), ("rat", 2)), "incorrect counts for wordCountsDF") {
       wordCountsDF.collect().map({case Row(s : String, c : Long) => (s,c)}).sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * --------------------------------------------
      * 2. Finding unique words and a mean value
      * --------------------------------------------
@@ -854,16 +814,15 @@ object Word_count_text {
      * You can use other DataFrames that you have already created to make this easier.
      */
     // TODO: Replace ??? with appropriate code
-    val uniqueWordsCount = ???
+    val uniqueWordsCount = wordCountsDF.count //???
     println(uniqueWordsCount)
 
     // TEST Unique words
     assertResult(3, "incorrect count of unique words") {
       uniqueWordsCount
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * --------------------------------------------
      * Apply word count to a file
      * --------------------------------------------
@@ -886,8 +845,8 @@ object Word_count_text {
 
     Returns:
         DataFrame of (str, int): A DataFrame containing 'word' and 'count' columns.
-     */
-     ???
+       */
+      wordListDF.groupBy("word").count
     }
     wordCountDF(wordsDF).show()
 
@@ -895,9 +854,8 @@ object Word_count_text {
     assertResult(Array(("cat", 2), ("elephant", 1), ("rat", 2)), "incorrect definition for wordCountDF function") {
       wordCountDF(wordsDF).collect().map({case Row(s : String, c : Long) => (s,c)}).sortBy(_._1)
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** Capitalization and punctuation **
      *
      * Real world files are more complicated than the data we have been using in this lab.
@@ -935,7 +893,7 @@ object Word_count_text {
 
     Returns:
         Column: A Column named 'sentence' with clean-up operations applied.
-     */
+       */
 
       lower(trim(regexp_replace(coll, "[^\\w\\s\\d]*","")))
     }
@@ -947,9 +905,8 @@ object Word_count_text {
     sentenceDF
       .select(removePunctuationDF(sentenceDF("sentence")))
       .show(truncate = false)
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** Load a text file **
      *
      * For the next part of this lab, we will use the Complete Works of William Shakespeare from Project Gutenberg.
@@ -960,9 +917,7 @@ object Word_count_text {
     val shakespeareDF = spark.sqlContext.read.text(fileName).select(removePunctuationDF(col("value")))
     shakespeareDF.show(15, truncate = false)
 
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+    /***
      * ** Words from lines **
      *
      * Before we can use the wordcount() function, we have to address two issues with the format of the DataFrame:
@@ -979,7 +934,7 @@ object Word_count_text {
      *    Note that shakeWordsDF should be a DataFrame with one column named word.
      */
     // TODO: Replace ??? with appropriate code
-    val shakeWordsDF :DataFrame = (shakespeareDF.???)
+    val shakeWordsDF :DataFrame = (shakespeareDF.select(explode(split(shakespeareDF.col("lower(trim(regexp_replace(value, [^\\w\\s\\d]*, )))"), " ")).alias("word"))).where("length(word) > 0")
     shakeWordsDF.show()
     val shakeWordsDFCount = shakeWordsDF.count()
     println(shakeWordsDFCount)
@@ -991,9 +946,8 @@ object Word_count_text {
     assertResult(Array("word"),"shakeWordsDF should only contain the Column 'word'") {
       shakeWordsDF.columns
     }
-     *//***<DELETE ME>*/
-    /***<DELETE this line if you finished last section with no errors>
-/***
+
+    /***
      * ** Count the words **
      *
      * We now have a DataFrame that is only words.
@@ -1006,7 +960,7 @@ object Word_count_text {
      */
 
     // TODO: Replace ??? with appropriate code
-    val topWordsAndCountsDF = ???
+    val topWordsAndCountsDF = wordCountDF(shakeWordsDF).orderBy(desc("count")) //???
     topWordsAndCountsDF.show()
 
     // TEST Count the words (4e)
@@ -1019,6 +973,5 @@ object Word_count_text {
         case Row(s:String,c:Long) => (s,c)
       })
     }
-     *//***<DELETE ME>*/
   }
 }
